@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Klasifikasi Motif Batik</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+    <header>
+        <h1>Klasifikasi Motif Batik</h1>
+    </header>
+
+    <main>
+        <div class="content-wrapper">
+            <a href="{{ url_for('landing') }}" class="back-to-home">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Kembali ke Beranda
+            </a>
+
+            <div id="upload-section" class="{% if predicted_class or error_msg %}hidden{% endif %}">
+                <p class="instruction">Unggah gambar batik untuk dideteksi</p>
+                <form id="upload-form" method="POST" enctype="multipart/form-data">
+                    <label for="batik_image_input" class="file-drop-area">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-upload-cloud"><path d="M18 10a8 8 0 1 0-16 0"></path><path d="M20.59 12.41a2 2 0 0 1 0 2.83l-5.66 5.66a2 2 0 0 1-2.83 0l-5.66-5.66a2 2 0 0 1 0-2.83l5.66-5.66a2 2 0 0 1 2.83 0l5.66 5.66z"></path><path d="M12 12v-2"></path></svg>
+                        <span class="file-msg" id="file-name-display">Seret & letakkan gambar atau klik untuk memilih</span>
+                        <input type="file" name="batik_image" id="batik_image_input" accept="image/*" required />
+                    </label>
+                    <button type="submit">Klasifikasikan</button>
+                </form>
+            </div>
+
+            <div id="loading-section" class="loading-section hidden">
+                <div class="spinner"></div>
+                <p>Menganalisis Motif Batik...</p>
+            </div>
+
+            <div id="result-section" class="{% if not predicted_class %}hidden{% endif %}">
+                {% if predicted_class %}
+                    <div class="result-container">
+                        <div class="result-details">
+                            <div class="result">
+                                <h2>Motif yang Diprediksi:</h2>
+                                <p><strong>{{ predicted_class }}</strong></p>
+                                {% if file_url %}
+                                    <img src="{{ file_url }}" alt="Gambar Batik yang Diunggah" class="uploaded-image" />
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="result-description">
+                            <h3>Deskripsi Motif</h3>
+                            <p>{{ description }}</p>
+                        </div>
+                    </div>
+                    <button id="predict-again-btn" type="button">Klasifikasi Gambar Lain</button>
+                {% endif %}
+            </div>
+
+            {% if error_msg %}
+                <div class="error">{{ error_msg }}</div>
+                <button id="try-again-btn" type="button" style="margin-top: 1rem;">Coba Lagi</button>
+            {% endif %}
+        </div>
+    </main>
+
+    <footer>
+        &copy; 2025 Dibuat oleh Muhamad Rayhan Adrian.
+    </footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const uploadSection = document.getElementById('upload-section');
+        const loadingSection = document.getElementById('loading-section');
+        const uploadForm = document.getElementById('upload-form');
+        const predictAgainBtn = document.getElementById('predict-again-btn');
+        const tryAgainBtn = document.querySelector('.error + button');
+        const fileInput = document.getElementById('batik_image_input');
+        const fileDropArea = document.querySelector('.file-drop-area');
+        const fileDisplayName = document.getElementById('file-name-display');
+
+        if (uploadForm) {
+            uploadForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                if (uploadSection) uploadSection.classList.add('hidden');
+                if (loadingSection) loadingSection.classList.remove('hidden');
+
+                setTimeout(() => {
+                    uploadForm.submit();
+                }, 500);
+            });
+        }
+
+        if (predictAgainBtn) {
+            predictAgainBtn.addEventListener('click', function() {
+                window.location.href = "{{ url_for('index') }}";
+            });
+        }
+
+        if (tryAgainBtn) {
+            tryAgainBtn.addEventListener('click', function() {
+                window.location.href = "{{ url_for('index') }}";
+            });
+        }
+
+        function updateFileName(file) {
+            if (file) {
+                fileDisplayName.textContent = file.name;
+                fileDropArea.classList.add('file-chosen');
+            } else {
+                fileDisplayName.textContent = 'Seret & letakkan gambar atau klik untuk memilih';
+                fileDropArea.classList.remove('file-chosen');
+            }
+        }
+
+        if (fileInput) {
+            fileInput.addEventListener('change', function() {
+                if (fileInput.files.length > 0) {
+                    updateFileName(fileInput.files[0]);
+                }
+            });
+        }
+
+        if (fileDropArea) {
+            fileDropArea.addEventListener('dragover', function(event) {
+                event.preventDefault();
+                fileDropArea.classList.add('drag-over');
+            });
+            fileDropArea.addEventListener('dragleave', function() {
+                fileDropArea.classList.remove('drag-over');
+            });
+            fileDropArea.addEventListener('drop', function(event) {
+                event.preventDefault();
+                fileDropArea.classList.remove('drag-over');
+                const files = event.dataTransfer.files;
+                if (files.length > 0) {
+                    fileInput.files = files;
+                    updateFileName(files[0]);
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>

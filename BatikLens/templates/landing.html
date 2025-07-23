@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BatikLens</title>
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing-style.css') }}">
+    
+</head>
+<body>
+    <div class="landing-page">
+        
+        <header class="header">
+            <div class="logo">
+                <span class="batik-text">Batik</span><span class="lens-text">Lens</span>
+            </div>
+        </header>
+
+        <section class="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">Implementasi Klasifikasi Motif Batik</h1>
+                <p class="hero-subtitle">Sistem ini menerapkan model deep learning dengan arsitektur EfficientNet untuk mengklasifikasikan motif batik secara akurat. Unggah gambar untuk menguji performa model.</p>
+                <a href="{{ url_for('index') }}" class="cta-button">Mulai Klasifikasi</a>
+            </div>
+            <div class="hero-image">
+                <img src="{{ url_for('static_img', filename='hero-batik.png') }}" alt="Kolase Motif Batik">
+            </div>
+        </section>
+
+        <footer class="landing-footer">
+            &copy; 2025 Dibuat oleh Muhamad Rayhan Adrian.
+        </footer>
+        
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const startBtn = document.querySelector('.cta-button');
+
+            if (startBtn) {
+                startBtn.addEventListener('click', function(event) {
+                    event.preventDefault(); 
+                    this.classList.add('loading');
+                    const destination = this.href;
+                    setTimeout(() => {
+                        window.location.href = destination;
+                    }, 500);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
